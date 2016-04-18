@@ -1,10 +1,9 @@
 (ns picture-gallery.handler
-  (:require
-   [compojure.route :as route]
-   [compojure.core :refer [defroutes]]
-   [noir.util.middleware :as noir-middleware]
-   [picture-gallery.routes.home :refer [home-routes]]
-   [picture-gallery.routes.auth :refer [auth-routes]]))
+  (:require [compojure.route :as route]
+            [compojure.core :refer [defroutes]]
+            [noir.util.middleware :as noir-middleware]
+            [picture-gallery.routes.home :refer [home-routes]]
+            [picture-gallery.routes.auth :refer [auth-routes]]))
 
 (defn init []
   (println "picture-gallery is starting"))

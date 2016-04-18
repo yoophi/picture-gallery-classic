@@ -8,3 +8,11 @@ h1 {
     text-align: center;
 }
 
+label {
+    width: 150px;
+    float: left;
+}
+
+.error {
+    color: red;
+}
