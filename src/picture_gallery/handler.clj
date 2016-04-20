@@ -2,6 +2,7 @@
   (:require [compojure.route :as route]
             [compojure.core :refer [defroutes]]
             [noir.util.middleware :as noir-middleware]
+            [noir.session :as session]
             [picture-gallery.routes.auth :refer [auth-routes]]
             [picture-gallery.routes.home :refer [home-routes]]
             [picture-gallery.routes.upload :refer [upload-routes]]))
@@ -12,6 +13,9 @@
 (defn destroy []
   (println "picture-gallery is shutting down"))
 
+(defn user-page [_]
+  (session/get :user))
+
 (defroutes app-routes
   (route/resources "/")
   (route/not-found "Not Found"))
@@ -20,4 +24,5 @@
           [auth-routes
            home-routes
            upload-routes
-           app-routes]))
+           app-routes]
+          :access-rules [user-page]))
