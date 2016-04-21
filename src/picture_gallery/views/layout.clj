@@ -1,7 +1,7 @@
 (ns picture-gallery.views.layout
-  (:require [hiccup.page :refer [html5 include-css]]
-            [hiccup.element :refer [link-to]]
+  (:require [hiccup.element :refer [link-to]]
             [hiccup.form :refer :all]
+            [hiccup.page :refer [html5 include-css include-js]]
             [noir.session :as session]))
 
 (defn make-menu [& items]
@@ -27,7 +27,8 @@
   (html5
    [:head
     [:title "Welcome to picture-gallery"]
-    (include-css "/css/screen.css")]
+    (include-css "/css/screen.css")
+    (include-js "//code.jquery.com/jquery-2.0.2.min.js")]
    [:body content]))
 
 (defn common [& content]
