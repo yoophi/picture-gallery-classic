@@ -38,8 +38,8 @@
   (make-menu
    (link-to "/" "home")
    (link-to "/upload" "upload images")
-   (link-to "/logout" (str "logout " user))))
- 
+   (link-to "/logout" (str "logout " user))
+   (link-to "/delete-account" "delete account")))
 
 (defn base [& content]
   (RenderablePage. content))
