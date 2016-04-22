@@ -2,7 +2,25 @@
   (:require [hiccup.element :refer [link-to]]
             [hiccup.form :refer :all]
             [hiccup.page :refer [html5 include-css include-js]]
-            [noir.session :as session]))
+            [noir.session :as session]
+            [ring.util.response :refer [content-type response]]
+            [compojure.response :refer [Renderable]]))
+
+(defn utf-8-response [html]
+  (content-type (response html) "text/html; charset=utf-8"))
+
+(deftype RenderablePage [content]
+  Renderable
+  (render [this request]
+    (utf-8-response
+     (html5
+      [:head
+       [:title "Welcome to picture-gallery"]
+       (include-css "/css/screen.css")
+       [:script {:type "text/javascript"}
+        (str "var context=\"" (:context request) "\";")]
+       (include-js "//code.jquery.com/jquery-2.0.2.min.js")]
+      [:body content]))))
 
 (defn make-menu [& items]
   [:div (for [item items] [:div.menuitem item])])
@@ -24,12 +42,7 @@
  
 
 (defn base [& content]
-  (html5
-   [:head
-    [:title "Welcome to picture-gallery"]
-    (include-css "/css/screen.css")
-    (include-js "//code.jquery.com/jquery-2.0.2.min.js")]
-   [:body content]))
+  (RenderablePage. content))
 
 (defn common [& content]
   (base
