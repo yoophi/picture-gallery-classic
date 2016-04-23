@@ -19,11 +19,13 @@
        (include-css "/css/screen.css")
        [:script {:type "text/javascript"}
         (str "var context=\"" (:context request) "\";")]
-       (include-js "//code.jquery.com/jquery-2.0.2.min.js")]
+       (include-js "//code.jquery.com/jquery-2.0.2.min.js"
+                   "/js/colors.js"
+                   "/js/site.js")]
       [:body content]))))
 
 (defn make-menu [& items]
-  [:div (for [item items] [:div.menuitem item])])
+  [:div#usermenu (for [item items] [:div.menuitem item])])
 
 (defn guest-menu []
   (make-menu
