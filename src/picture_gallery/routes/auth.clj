@@ -9,30 +9,13 @@
             [noir.util.crypt :as crypt]
             [noir.util.route :refer [restricted]]
             [picture-gallery.models.db :as db]
-            [picture-gallery.routes.upload :refer [delete-image]]
-            [picture-gallery.util :refer [gallery-path thumb-prefix]])
+            [picture-gallery.util :refer [gallery-path]]
+            [picture-gallery.routes.upload :refer [delete-image]])
   (:import java.io.File))
 
-(defn delete-account-page []
-  (layout/common
-   (form-to [:post "/confirm-delete"]
-            (submit-button "delete account"))
-   (form-to [:get "/"]
-            (submit-button "cancel"))))
-
-(defn handle-confirm-delete []
-  (let [user (session/get :user)]
-    (doseq [{:keys [name]} (db/images-by-user user)]
-      (delete-image user name))
-    (clojure.java.io/delete-file (gallery-path))
-    (db/delete-user user))
-  (session/clear!)
-  (resp/redirect "/"))
-
 (defn create-gallery-path []
-  (let [user-path (File. gallery-path)]
-    (if-not (.exists user-path)
-      (.mkdirs user-path))
+  (let [user-path (File. (gallery-path))]
+    (if-not (.exists user-path) (.mkdirs user-path))
     (str (.getAbsolutePath user-path) File/separator)))
 
 (defn valid? [id pass pass1]
@@ -76,16 +59,6 @@
    :else
    "An error has occured while processing the request"))
 
-(defn handle-login [id pass]
-  (let [user (db/get-user id)]
-    (if (and user (crypt/compare pass (:pass user)))
-      (session/put! :user id)))
-  (resp/redirect "/"))
-
-(defn handle-logout []
-  (session/clear!)
-  (resp/redirect "/"))
-
 (defn handle-registration [id pass pass1]
   (if (valid? id pass pass1)
     (try
@@ -97,6 +70,33 @@
         (vali/rule false [:id (format-error id ex)])
         (registration-page)))
     (registration-page id)))
+
+(defn handle-login [id pass]
+  (let [user (db/get-user id)]
+    (if (and user (crypt/compare pass (:pass user)))
+      (session/put! :user id)))
+
+  (resp/redirect "/"))
+
+(defn handle-logout []
+  (session/clear!)
+  (resp/redirect "/"))
+
+(defn delete-account-page []
+  (layout/common
+   (form-to [:post "/confirm-delete"]
+            (submit-button "delete account"))
+   (form-to [:get "/"]
+            (submit-button "cancel"))))
+
+(defn handle-confirm-delete []
+  (let [user (session/get :user)]
+    (doseq [{:keys [name]} (db/images-by-user user)]
+      (delete-image user name))
+    (clojure.java.io/delete-file (gallery-path))
+    (db/delete-user user))
+  (session/clear!)
+  (resp/redirect "/"))
 
 (defroutes auth-routes
   (GET "/register" []

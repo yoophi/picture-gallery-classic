@@ -11,9 +11,7 @@
   `(sql/with-connection ~db (~f ~@body)))
 
 (defn create-user [user]
-  (sql/with-connection
-    db
-    (sql/insert-record :users user)))
+  (with-db sql/insert-record :users user))
 
 (defn get-user [id]
   (with-db sql/with-query-results
@@ -22,7 +20,6 @@
 (defn add-image [userid name]
   (with-db
     sql/transaction
-
     (if (sql/with-query-results
           res
           ["select userid from images where userid = ? and name = ?" userid name]
@@ -41,8 +38,7 @@
     sql/with-query-results
     res
     ["select * from
-         (select *, row_number() over (partition by userid)
-          as row_number from images)
+         (select *, row_number() over (partition by userid) as row_number from images)
          as rows where row_number = 1"]
     (doall res)))
 
@@ -51,5 +47,4 @@
     sql/delete-rows :images ["userid=? and name=?" userid name]))
 
 (defn delete-user [userid]
-  (with-db
-    sql/delete-rows :users ["id=?" userid]))
+  (with-db sql/delete-rows :users ["id=?" userid]))

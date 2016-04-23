@@ -24,6 +24,9 @@
                    "/js/site.js")]
       [:body content]))))
 
+(defn base [& content]
+  (RenderablePage. content))
+
 (defn make-menu [& items]
   [:div#usermenu (for [item items] [:div.menuitem item])])
 
@@ -42,9 +45,6 @@
    (link-to "/upload" "upload images")
    (link-to "/logout" (str "logout " user))
    (link-to "/delete-account" "delete account")))
-
-(defn base [& content]
-  (RenderablePage. content))
 
 (defn common [& content]
   (base

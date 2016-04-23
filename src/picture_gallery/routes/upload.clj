@@ -35,25 +35,12 @@
         ratio      (/ thumb-size img-height)]
     (scale img ratio (int (* img-width ratio)) thumb-size)))
 
-(defn delete-image [userid name]
-  (try
-    (db/delete-image userid name)
-    (io/delete-file (str (gallery-path) File/separator name))
-    (io/delete-file (str (gallery-path) File/separator thumb-prefix name))
-    "ok"
-    (catch Exception ex (.getMessage ex))))
-
 (defn save-thumbnail [{:keys [filename]}]
   (let [path (str (gallery-path) File/separator)]
     (ImageIO/write
      (scale-image (io/input-stream (str path filename)))
      "jpeg"
      (File. (str path thumb-prefix filename)))))
-
-(defn delete-images [names]
-  (let [userid (session/get :user)]
-    (resp/json
-     (for [name names] {:name name :status (delete-image userid name)}))))
 
 (defn upload-page [info]
   (layout/common
@@ -67,8 +54,7 @@
 (defn handle-upload [{:keys [filename] :as file}]
   (upload-page
    (if (empty? filename)
-     (str "please select a file to upload " file)
-
+      "please select a file to upload"
      (try
        (upload-file (gallery-path) file :create-path? true)
        (save-thumbnail file)
@@ -77,6 +63,19 @@
               (thumb-uri (session/get :user) filename))
        (catch Exception ex
          (str "error uploading file " (.getMessage ex)))))))
+
+(defn delete-image [userid name]
+  (try
+    (db/delete-image userid name)
+    (io/delete-file (str (gallery-path) File/separator name))
+    (io/delete-file (str (gallery-path) File/separator thumb-prefix name))
+    "ok"
+    (catch Exception ex (.getMessage ex))))
+
+(defn delete-images [names]
+  (let [userid (session/get :user)]
+    (resp/json
+     (for [name names] {:name name :status (delete-image userid name)}))))
 
 (defn serve-file [user-id file-name]
   (file-response (str galleries File/separator user-id File/separator file-name)))
@@ -90,6 +89,3 @@
   (POST "/upload" [file] (restricted (handle-upload file)))
 
   (POST "/delete" [names] (restricted (delete-images names))))
-
-                                             
-                

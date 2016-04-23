@@ -10,7 +10,7 @@
 
 (defn thumbnail-link [{:keys [userid name]}]
   [:div.thumbnail
-   [:a {:href (image-uri userid name)}
+   [:a {:class name :href (image-uri userid name)}
     (image (thumb-uri userid name))
     (if (= userid (session/get :user)) (check-box name))]])
 
